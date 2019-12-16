@@ -20,21 +20,37 @@
 %    You should have received a copy of the GNU General Public License
 %    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function result = nanoCommand(hCom, command)
-    fprintf(hCom, command);
+#    fprintf(hCom, command);
+    srl_flush(hCom,1); #flush input
+    srl_write(hCom,command);
+    srl_write(hCom,char(13));
+    srl_flush(hCom,0); # flush output
     isValid = false;
     lines = {};
     line = '';
+    data = [];
+    srl_timeout (hCom, 10);
     while true
-        data = fread(hCom, 1);
-        if numel(data) ~= 1
+#        data = fread(hCom, 1);
+ #       set(hCom,"timeout",10);
+        if numel(data) == 0
+          data = srl_read(hCom, 100);
+          if numel(data) == 0
+            break;
+          end;
+         end;
+ #       char(data)
+ #       numel(data)
+        if numel(data) == 0
             c = 13;
         else
             c = data(1);
+            data(1) = [];
         end;
         if c == 10
             continue;
         elseif c ~= 13
-            line = [line, c];
+            line = [line, char(c)];
             if strcmp(strtrim(line), 'ch>') == 1
                 break;
             end;
@@ -43,12 +59,12 @@ function result = nanoCommand(hCom, command)
         if isValid
             lines{end+1} = line;
         else
-            isValid = strcmp(strtrim(line), command) == 1;
+            isValid = (strcmp(strtrim(line), command) == 1);
         end;
         line = '';
-        if numel(data) ~= 1
-            break;
-        end;
+#        if numel(data) ~= 1
+#            break;
+#        end;
     end;
     result = lines;
 end

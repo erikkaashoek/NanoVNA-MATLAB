@@ -20,19 +20,22 @@
 %    You should have received a copy of the GNU General Public License
 %    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function hCom = nanoOpen(port)
-    hCom = serial(port);
-    hCom.InputBufferSize = 4096;
-    hCom.Terminator = 13;
+#    hCom.InputBufferSize = 4096;
+#    hCom.Terminator = 13;
     try
-        fprintf('connect: %s\n', hCom.Name);
-        fopen(hCom);
-        fprintf('status:  %s\n', hCom.Status);
-        if strcmp(hCom.Status, 'open') ~= 1
-            delete(hCom);
-            hCom = [];
-        end;
+        hCom = serial(port);
+        set(hCom,"timeout",10);
+        data = srl_read(hCom, 1000);
+        char(data)
+ %       fprintf('connect: %s\n', hCom.port);
+ %       fopen(hCom);
+ %       fprintf('status:  %s\n', hCom.open);
+ %       if hCom.open == 0
+ %           delete(hCom);
+ %           hCom = [];
+ %       end;
     catch ex
-        delete(hCom);
+#       delete(hCom);
         rethrow(ex)
     end;
 end

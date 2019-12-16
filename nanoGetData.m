@@ -30,15 +30,24 @@ function netwk = nanoGetData(hCom)
     % convert string responses to s-network
     len = numel(str_freq);
     freqs = zeros(1,len);
+#    s11 = zeros(1,len);
+#    s21 = zeros(1,len);
     sparams = zeros(2,2,len);
     for i=1:len
         freqs(i) = str2double(str_freq{i});
+#        s11(i) = str2complex(str_s11{i});
+#        s21(i) = str2complex(str_s21{i});
         sparams(1,1,i) = str2complex(str_s11{i});
         sparams(2,1,i) = str2complex(str_s21{i});
         sparams(1,2,i) = complex(0,0);
         sparams(2,2,i) = complex(0,0);
     end;
-    netwk = sparameters(sparams, freqs, 50.0);
+#    netwk = sparameters(sparams, freqs, 50.0);
+    netwk.Frequencies = freqs;
+#    netwk.s11 = s11;
+#    netwk.s21 = s21;
+    netwk.Parameters = sparams;
+    netwk.Z0 = 50.0;
     
     function value = str2complex(str)
         vals = strsplit(str);

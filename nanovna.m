@@ -19,14 +19,23 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 function nanovna()
     clear; close all; clc;
-    hCom = nanoOpen('COM3');
+   % isoctave = (exist('OCTAVE_VERSION')~=0);
+   % if isoctave
+      pkg load instrument-control;
+   % end;
+    hCom = nanoOpen("COM3:");
     cleaner = onCleanup(@() nanoClose(hCom));
 
+ #   nanoCommand(hCom, 'suspend');
+ #   nanoCommand(hCom, 'resume');
+  
     nanoCommand(hCom, 'sweep start 50000');
     nanoCommand(hCom, 'sweep stop 900000000');
     netwk = nanoGetData(hCom);
+    rfwrite(netwk.Parameters, netwk.Frequencies,"text.s2p");
     
     % save network data
     %rfwrite(netwk.Parameters, netwk.Frequencies, 'data.s2p');
@@ -34,40 +43,14 @@ function nanovna()
 
     % plot S11 LOGMAG
     fig = figure('Name','LOGMAG', 'NumberTitle','off');
-    %set(fig,'Position',[10 10 320 240])
-    rfplot(netwk,1,1, '-r')
-    ylim([-90 10])
+    plot(netwk.Frequencies ./ 1000000,20*log10(abs(netwk.Parameters(1,1,1:101))))
     hold on
-    rfplot(netwk,2,1, '-b')
-    hold off
-    
-    % plot S11 SMITH CHART
-    fig = figure('Name','SMITH', 'NumberTitle','off');
-    %set(fig,'Position',[10 10 320 240])
-    smith(netwk,1,1);
-    
-    
-    %===plot TDR step response===
-    
-    % fit to a rational function object
-    tdrfit = rationalfit(netwk.Frequencies, rfparam(netwk, 1,1));
-    
-    % Parameters for a step signal
-    Ts = 3e-12;
-    N = 32768;
-    Trise = 1e-10;
-    
-    % Calculate the step response for TDR and plot it
-    [tdr,t1] = stepresp(tdrfit,Ts,N,Trise);
-    tdrz = arrayfun(@(x) 50 * (1+x)/(1-x), tdr);
-    
-    fig = figure('Name','TDR Step Response', 'NumberTitle','off');
-    plot(t1*1e9, tdrz, 'LineWidth',2);
-    ylabel('TDR Step Response [Ohm]');
-    xlabel('Delay [ns]');
-    xlim([0 Ts*N*1e9])
-    ylim([10 60])
+    plot(netwk.Frequencies ./ 1000000,20*log10(abs(netwk.Parameters(2,1,1:101))))
+    ylabel('dBm');
+    xlabel('MHz');
+    ylim([-90 +10]);
+    xlim([0  900]);
     grid on;
     grid minor;
-    
+   
 end

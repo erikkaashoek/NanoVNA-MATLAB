@@ -20,7 +20,7 @@
 %    You should have received a copy of the GNU General Public License
 %    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function rfwrite(s, freq, fileName)
-    N = size(freq);
+    N = numel(freq);
     order = size(s,1);
     fid = fopen(fileName, 'wt');
     % comment

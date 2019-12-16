@@ -20,11 +20,11 @@
 %    You should have received a copy of the GNU General Public License
 %    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function nanoClose(hCom) 
-    if ~isempty(hCom) && isvalid(hCom) && strcmp(hCom.Status, 'open') == 1
-        fprintf('close\n');
+#    if ~isempty(hCom) && isvalid(hCom) && hCom.open == 1
+#        fprintf('close\n');
         fclose(hCom);
-    end;
-    if isvalid(hCom)
-        delete(hCom);
-    end;
+#    end;
+#    if isvalid(hCom)
+#        delete(hCom);
+#    end;
 end
