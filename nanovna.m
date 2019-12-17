@@ -27,6 +27,8 @@ function nanovna()
       pkg load instrument-control;
    % end;
     hCom = nanoOpen("COM3:");
+% For ports above COM9 you have to use a different syntax
+%   hCom = nanoOpen("\\\\.\\COM14")
     cleaner = onCleanup(@() nanoClose(hCom));
 
  #   nanoCommand(hCom, 'suspend');
